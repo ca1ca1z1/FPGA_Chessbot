@@ -53,7 +53,7 @@ module tb_chess_board;
     initial begin
         // Hold reset for 3 clocks, then release.
         repeat (3) @(posedge clock);
-        reset = 0;
+        @(negedge clock); reset = 0;
         @(posedge clock);
 
         // Read a few squares one at a time through the read port.
@@ -72,7 +72,7 @@ module tb_chess_board;
         read_square_index = 6'd28;  #20;                                  // watch e4 on the read port
 
         // Reset again in the middle of a game.
-        reset = 1; repeat (2) @(posedge clock); reset = 0;
+        @(negedge clock); reset = 1; repeat (2) @(posedge clock); @(negedge clock); reset = 0;
         read_square_index = 6'd12;  #20;                                  // e2 should have its pawn back
         read_square_index = 6'd28;  #20;                                  // e4 should be empty again
 

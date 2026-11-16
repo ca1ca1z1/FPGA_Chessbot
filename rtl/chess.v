@@ -20,9 +20,12 @@ module chess (
     wire       side_to_move;
     wire [3:0] castling_rights;
 
+    wire board_reset;
+    reset_sync reset_control (.clk(CLOCK_50), .reset_request(~KEY[0]), .reset_out(board_reset));
+
     chess_board board (
         .clock(CLOCK_50),
-        .reset(~KEY[0]),  // KEY is active low, reset is active high
+        .reset(board_reset),  // synchronized release; board reset remains synchronous
 
         // Nothing writes to the board yet, so these are tied off to 0.
         .write_square_enable(1'b0),
@@ -49,7 +52,7 @@ module chess (
     );
 
     assign LEDR[3:0] = piece_on_selected_square;
-    assign LEDR[4]   = 1'b0;                   // unused
+    assign LEDR[4]   = board_reset;             // reset active indicator
     assign LEDR[8:5] = castling_rights;
     assign LEDR[9]   = side_to_move;
 

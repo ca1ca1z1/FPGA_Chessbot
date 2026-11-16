@@ -11,3 +11,4 @@
 *.bak
 *.cr.mti
 *.qws
+/build/

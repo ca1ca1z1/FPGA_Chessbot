@@ -29,8 +29,8 @@ module tb_chess();
         #5;
         KEY[0] = 0;
         repeat (3) @(posedge CLOCK_50);
-        KEY[0] = 1;
-        @(posedge CLOCK_50);
+        @(negedge CLOCK_50); KEY[0] = 1;
+        repeat (3) @(posedge CLOCK_50);
 
         // Step through some squares by changing the switches.
         SW[5:0] = 6'd0;   #40;    // a1

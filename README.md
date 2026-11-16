@@ -1,4 +1,14 @@
-# V1.0.0
+# v1.0.1
+
+- Added DE1-SoC pin assignments and 50 MHz timing constraints.
+- Separated hardware sources (`rtl/`) from testbenches (`sim/`) and updated Quartus and ModelSim paths.
+- Added an asynchronous-assert, synchronous-release reset synchronizer; LEDR[4] indicates active reset.
+- Moved testbench reset release away from rising clock edges.
+
+Open `chess.qpf` in Quartus or `chess.mpf` in ModelSim. Run automated checks with `scripts/verify.ps1`.
+Update this README with every future release. Hardware validation is still pending.
+
+# v1.0.0
 
 ## Current Features
 
