@@ -5,9 +5,6 @@
 - Added an asynchronous-assert, synchronous-release reset synchronizer; LEDR[4] indicates active reset.
 - Moved testbench reset release away from rising clock edges.
 
-Open `chess.qpf` in Quartus or `chess.mpf` in ModelSim. Run automated checks with `scripts/verify.ps1`.
-Update this README with every future release. Hardware validation is still pending.
-
 # v1.0.0
 
 ## Current Features
