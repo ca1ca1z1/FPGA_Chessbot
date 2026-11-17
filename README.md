@@ -1,3 +1,7 @@
+# v1.1.2
+
+- Added Milestone1.pdf.
+
 # v1.1.1
 
 - Fixed an issue where ModelSim failed to load the project.
