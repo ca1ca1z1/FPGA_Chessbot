@@ -7,11 +7,14 @@ Push-Location "$root\build\verify"
 try {
     if (-not (Test-Path modelsim.ini)) { & "$ModelSimBin\vmap.exe" -c }
     if (-not (Test-Path work)) { & "$ModelSimBin\vlib.exe" work }
-    & "$ModelSimBin\vlog.exe" -vlog01compat "$root\rtl\reset_sync.v" "$root\rtl\chess_board.v" "$root\rtl\chess.v" "$root\sim\tb_chess.v" "$root\sim\tb_chess_board.v" "$root\sim\tb_v101.v"
+    & "$ModelSimBin\vlog.exe" -vlog01compat "$root\rtl\reset_sync.v" "$root\rtl\button_press.v" "$root\rtl\move_checker.v" "$root\rtl\chess_game.v" "$root\rtl\chess_board.v" "$root\rtl\chess.v" "$root\sim\tb_chess.v" "$root\sim\tb_chess_board.v" "$root\sim\tb_v101.v" "$root\sim\tb_moves.v"
     if ($LASTEXITCODE -ne 0) { throw 'Verilog compilation failed' }
     $commands='onerror {quit -code 1 -force}; onbreak {resume}; vsim work.tb_v101; onfinish stop; run -all; if {[examine -radix unsigned /tb_v101/passed] != 1} {quit -code 1 -force}; quit -code 0 -force'
     & "$ModelSimBin\vsim.exe" -c -l simulation.log -do $commands
     if ($LASTEXITCODE -ne 0) { throw 'Reset/top-level tests failed' }
+    $commands='onerror {quit -code 1 -force}; onbreak {resume}; vsim work.tb_moves; onfinish stop; run -all; if {[examine -radix unsigned /tb_moves/passed] != 1} {quit -code 1 -force}; quit -code 0 -force'
+    & "$ModelSimBin\vsim.exe" -c -l moves.log -do $commands
+    if ($LASTEXITCODE -ne 0) { throw 'Move tests failed' }
     # Existing standalone board test: also check the moved board and final reset.
     $commands='onerror {quit -code 1 -force}; vsim work.tb_chess_board; run 120 ns; if {[examine -radix unsigned /tb_chess_board/board_under_test/board_squares(12)] != 0 || [examine -radix unsigned /tb_chess_board/board_under_test/board_squares(28)] != 1} {quit -code 1 -force}; run 100 ns; if {[examine -radix unsigned /tb_chess_board/board_under_test/board_squares(12)] != 1 || [examine -radix unsigned /tb_chess_board/board_under_test/board_squares(28)] != 0} {quit -code 1 -force}; puts {PASS board move and reset}; quit -code 0 -force'
     & "$ModelSimBin\vsim.exe" -c -l board.log -do $commands
@@ -30,5 +33,5 @@ try {
     $rows=[regex]::Matches($ucp,'(?m)^;\s*(?:Illegal Clocks|Unconstrained[^;]+)\s*;\s*(\d+)\s*;\s*(\d+)\s*;')
     if($rows.Count -ne 6) { throw 'Unexpected unconstrained-path report' }
     foreach($row in $rows) { if([int]$row.Groups[1].Value -ne 0 -or [int]$row.Groups[2].Value -ne 0) { throw 'Unconstrained paths remain' } }
-    Write-Host 'PASS v1.0.1 simulation, compilation and timing checks'
+    Write-Host 'PASS simulation, compilation and timing checks'
 } finally { Pop-Location }

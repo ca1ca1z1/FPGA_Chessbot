@@ -8,7 +8,7 @@ module tb_v101;
     reg passed=0;
     integer offset, square;
     reg [3:0] expected;
-    chess dut(clk,keys,switches,leds);
+    chess dut(.CLOCK_50(clk),.KEY(keys),.SW(switches),.LEDR(leds));
     task check;
         input ok; input [511:0] message;
         begin if(ok!==1'b1) begin $display("FAIL: %0s",message); $stop; end end
@@ -41,13 +41,13 @@ module tb_v101;
             check(dut.board_reset===0,"reset released after second edge");
             @(posedge clk); #1;
             for(square=0;square<64;square=square+1) begin
-                switches[5:0]=square; #1;
                 expected=initial_piece(square);
-                check(leds[3:0]===expected,"initial piece via top-level switches and LEDs");
-                check(leds[9:4]===6'b011110,"initial turn, castling and unused LED");
+                check(dut.all_squares_flat[4*square +: 4]===expected,"initial piece on every square");
             end
+            // Cursor starts on a1 (white rook); no selection, no winner, white to move.
+            check(leds===10'b0000000100,"LEDs after reset");
         end
-        passed=1; $display("PASS v1.0.1: reset phase sweep and all 64 top-level reads"); $finish;
+        passed=1; $display("PASS v1.0.1: reset phase sweep and all 64 squares"); $finish;
     end
     initial begin #100000; $display("FAIL watchdog"); $stop; end
 endmodule

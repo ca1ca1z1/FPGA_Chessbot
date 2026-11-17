@@ -1,3 +1,37 @@
+# v1.1.0
+
+Basic piece movement with the push buttons.
+
+## Controls
+
+- **KEY[3]:** move the cursor one column right; from column h it wraps back to a.
+- **KEY[2]:** move the cursor one row up; from row 8 it wraps back to row 1.
+- **KEY[1]:** confirm. With nothing selected it selects the piece under the cursor (only a piece of the side to move). On a legal destination it makes the move. On the selected square itself it cancels the selection. Anything else is ignored.
+- **KEY[0]:** reset to a new game.
+
+## Display
+
+- **HEX5 HEX4:** cursor square, for example `E2`.
+- **HEX3 HEX2:** selected square, blank when nothing is selected.
+- **LEDR[3:0]:** piece on the cursor square. **LEDR[4]:** reset active. **LEDR[5]:** piece selected. **LEDR[6]:** `move_legal`. **LEDR[7]:** game over. **LEDR[8]:** winner (0 white, 1 black). **LEDR[9]:** side to move.
+
+## Move Rules
+
+- Every piece moves in its normal pattern. Bishops, rooks, queens and the pawn's double step cannot jump over pieces.
+- A piece cannot land on a piece of its own colour; landing on an enemy piece captures it.
+- Not implemented: castling, en passant, promotion, and check. A king can be left attacked; the game ends when a king is captured, and the capturing side is the winner.
+
+## Signals for the VGA Display
+
+`chess_game` outputs `cursor_square`, `piece_selected`, `selected_square`, `move_legal` (1 when the selected piece may move to the cursor square), `legal_targets` (64 bits, bit N = the selected piece may move to square N), `game_over` and `winner`.
+
+## New Files
+
+- `rtl/move_checker.v`: combinational legality check for one from/to pair.
+- `rtl/chess_game.v`: cursor, selection, legal-target scan and move execution.
+- `rtl/button_press.v`: synchronizer, debounce and one pulse per press.
+- `sim/tb_moves.v`: self-checking test (random boards against a reference model, then a game played with the buttons).
+
 # v1.0.1
 
 - Added DE1-SoC pin assignments and 50 MHz timing constraints.

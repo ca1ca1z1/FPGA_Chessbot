@@ -4,8 +4,9 @@
 //
 // Plain ModelSim testbench for the top-level "chess" module.
 // It only drives the inputs. Look at the waveform to see the results:
-//   LEDR[3:0] = piece on the square chosen by SW[5:0]
-//   LEDR[8:5] = castling rights, LEDR[9] = side to move
+//   LEDR[3:0] = piece on the cursor square, LEDR[5] = piece selected,
+//   LEDR[6] = move legal, LEDR[9] = side to move
+// It plays e2-e4 with the buttons: KEY[3] right, KEY[2] up, KEY[1] confirm.
 
 `timescale 1ns / 1ns
 `default_nettype none
@@ -22,7 +23,19 @@ module tb_chess();
         CLOCK_50 <= ~CLOCK_50;
 
     // the design being tested (the Quartus top-level entity)
-    chess DUT (.CLOCK_50(CLOCK_50), .SW(SW), .KEY(KEY), .LEDR(LEDR));
+    // Short debounce so each button press only needs a few clocks.
+    chess #(.DEBOUNCE_BITS(2)) DUT (.CLOCK_50(CLOCK_50), .SW(SW), .KEY(KEY), .LEDR(LEDR));
+
+    // Press and release one button.
+    task press;
+        input integer key_number;
+        begin
+            @(negedge CLOCK_50); KEY[key_number] = 0;
+            repeat (12) @(negedge CLOCK_50);
+            KEY[key_number] = 1;
+            repeat (12) @(negedge CLOCK_50);
+        end
+    endtask
 
     initial begin
         // Press KEY[0] (active low) for 3 clocks, then release.
@@ -32,14 +45,14 @@ module tb_chess();
         @(negedge CLOCK_50); KEY[0] = 1;
         repeat (3) @(posedge CLOCK_50);
 
-        // Step through some squares by changing the switches.
-        SW[5:0] = 6'd0;   #40;    // a1
-        SW[5:0] = 6'd4;   #40;    // e1
-        SW[5:0] = 6'd12;  #40;    // e2
-        SW[5:0] = 6'd30;  #40;    // g4
-        SW[5:0] = 6'd59;  #40;    // d8
-        SW[5:0] = 6'd60;  #40;    // e8
-        SW[5:0] = 6'd63;  #40;    // h8
+        // Move the cursor from a1 to e2, select the pawn, go up to e4, confirm.
+        repeat (4) press(3);                      // a1 -> e1
+        press(2);                                 // e1 -> e2
+        press(1);                                 // select the e2 pawn
+        repeat (80) @(negedge CLOCK_50);          // legal targets are filled in (64 clocks)
+        repeat (2) press(2);                      // e2 -> e4, LEDR[6] turns on
+        press(1);                                 // make the move
+        repeat (20) @(negedge CLOCK_50);
 
         $stop;   // pauses ModelSim so you can inspect the waveform
     end
