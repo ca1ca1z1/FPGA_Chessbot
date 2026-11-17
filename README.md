@@ -1,3 +1,8 @@
+# v1.1.1
+
+- Fixed an issue where ModelSim failed to load the project.
+- Fixed an issue where the properties of the chess.mpf file were incomplete and fields were missing.
+
 # v1.1.0
 
 Basic piece movement with the push buttons.

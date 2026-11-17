@@ -24,7 +24,8 @@ module tb_chess();
 
     // the design being tested (the Quartus top-level entity)
     // Short debounce so each button press only needs a few clocks.
-    chess #(.DEBOUNCE_BITS(2)) DUT (.CLOCK_50(CLOCK_50), .SW(SW), .KEY(KEY), .LEDR(LEDR));
+    chess #(.DEBOUNCE_BITS(2)) DUT (.CLOCK_50(CLOCK_50), .SW(SW), .KEY(KEY), .LEDR(LEDR),
+                                    .HEX0(), .HEX1(), .HEX2(), .HEX3(), .HEX4(), .HEX5());
 
     // Press and release one button.
     task press;

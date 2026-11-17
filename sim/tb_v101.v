@@ -8,7 +8,7 @@ module tb_v101;
     reg passed=0;
     integer offset, square;
     reg [3:0] expected;
-    chess dut(.CLOCK_50(clk),.KEY(keys),.SW(switches),.LEDR(leds));
+    chess dut(.CLOCK_50(clk),.KEY(keys),.SW(switches),.LEDR(leds),.HEX0(),.HEX1(),.HEX2(),.HEX3(),.HEX4(),.HEX5());
     task check;
         input ok; input [511:0] message;
         begin if(ok!==1'b1) begin $display("FAIL: %0s",message); $stop; end end
